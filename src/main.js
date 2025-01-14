@@ -11,6 +11,9 @@ let justPoints = false;
 let fadeOverTime = true;
 const gui = new dat.GUI();
 
+
+
+
 // Set up the object to hold all the parameters for the GUI
 const params = {
     sigma: 10.0,
@@ -61,6 +64,9 @@ const reset = () => {
     x = 0.1;
     y = 0;
     z = 0;
+    zoom = 10;
+    offset = { x: 0, y: 0 };
+
 }
 
 gui.add({reset: reset}, 'reset').name('Reset');
@@ -86,21 +92,65 @@ const canvas = document.getElementById('canvas2D');
 const ctx = canvas.getContext('2d');
 
 const scaleFactor = window.devicePixelRatio || 1;
-console.log(scaleFactor);
-canvas.width = window.innerWidth  * scaleFactor;  // Adjust width for higher resolution
-canvas.height = window.innerHeight   * scaleFactor; // Adjust height for higher resolution
 
-canvas.style.width = `${canvas.width / scaleFactor}px`;
-canvas.style.height = `${canvas.height / scaleFactor}px`;
+// Function to resize and center canvas
+function resizeCanvas() {
+    canvas.width = window.innerWidth  * scaleFactor;
+    canvas.height = window.innerHeight  * scaleFactor;
 
+    // Match the visible size for CSS
+    canvas.style.width = `${canvas.width / scaleFactor}px`;
+    canvas.style.height = `${canvas.height / scaleFactor}px`;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any transformations
+    ctx.translate(canvas.width / 2, canvas.height / 2); // Move origin to center
+    
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 ctx.linJoin = 'round';
 ctx.lineCap = 'round';
+
+
 
 // Scale the 2D context to match the device pixel ratio
 ctx.scale(scaleFactor, scaleFactor);
 
+
+
+// Variables to handle dragging
+let isDragging = false;
+let dragStart = { x: 0, y: 0 }; // Initial mouse position when dragging starts
+let offset = { x: 0, y: 0 };    // Offset for rendering the center
+
+
+canvas.addEventListener('mousedown', (event) => {
+    isDragging = true;
+    dragStart = { x: event.clientX, y: event.clientY }; // Store the initial mouse position
+});
+
+canvas.addEventListener('mousemove', (event) => {
+    if (isDragging) {
+        // Calculate how much the mouse has moved
+        const dx = event.clientX - dragStart.x;
+        const dy = event.clientY - dragStart.y;
+
+        // Update the offset
+        offset.x += dx / zoom;
+        offset.y += dy / zoom;
+
+        // Update the drag start position to the current position
+        dragStart = { x: event.clientX, y: event.clientY };
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    isDragging = false; // Stop dragging
+});
+
 function draw2D() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
     
 
     lineWidth = 1 + Math.sin(Date.now() / 500) * pulsation;
@@ -108,8 +158,8 @@ function draw2D() {
     ctx.lineWidth = lineWidth;
     if (justPoints) {
         points.forEach(([px, py], index) => {
-            let screenX = canvas.width / 2 / scaleFactor + px * zoom;
-            let screenY = canvas.height / 2 / scaleFactor + py * zoom;
+            let screenX = (px + offset.x) * zoom;
+            let screenY = (py + offset.y) * zoom;
 
             ctx.beginPath();
             ctx.arc(screenX, screenY, 3, 0, Math.PI * 2);
@@ -124,8 +174,8 @@ function draw2D() {
         ctx.beginPath();
         points.forEach(([px, py], index) => {
             // Scale and center the points
-            let screenX = canvas.width / 2 / scaleFactor + px * zoom;
-            let screenY = canvas.height / 2 / scaleFactor + py * zoom;
+            let screenX = (px + offset.x) * zoom;
+            let screenY = (py + offset.y) * zoom;
 
             let fade = fadeOverTime ? Math.min(opacity, alpha + (index / points.length) * 0.9) : opacity;
 
