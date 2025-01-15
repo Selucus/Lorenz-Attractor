@@ -10,6 +10,7 @@ let opacity = 1;
 let justPoints = false;
 let fadeOverTime = true;
 let changeColourOverTime = false;
+let colourPulsation = false;
 const gui = new dat.GUI();
 
 
@@ -27,7 +28,8 @@ const params = {
     opacity: 1,
     justPoints: false,
     fadeOverTime: true,
-    changeColourOverTime: false
+    changeColourOverTime: false,
+    colourPulsation: false
 };
 gui.add(params, 'sigma', 0, 100).onChange(function(value) {
     sigma = value;
@@ -59,8 +61,25 @@ gui.add(params, 'justPoints').name('Draw Points Only').onChange(function(value) 
 gui.add(params, 'fadeOverTime').name('Fade Over Time').onChange(function(value) {
     fadeOverTime = value; 
 });
-gui.add(params, 'changeColourOverTime').name('Change Colour Over Time').onChange(function(value) {
-    changeColourOverTime = value; 
+gui_colourtime = gui.add(params, 'changeColourOverTime').listen().name('Change Colour By Coordinate').onChange(function(value) {
+    if(value){
+        changeColourOverTime = true;
+        colourPulsation = false;
+    }else{
+        changeColourOverTime = false;
+    }
+    gui_colourpulse.updateDisplay();
+    
+});
+gui_colourpulse = gui.add(params, 'colourPulsation').listen().name('Change Colour Over Time').onChange(function(value) {
+    if(value){
+        changeColourOverTime = false;
+        colourPulsation = true;
+    }else{
+        colourPulsation = false;
+    }
+    gui_colourtime.updateDisplay();
+    
 });
 
 
@@ -179,7 +198,7 @@ function draw2D() {
             ctx.fill();
         });
     } else{
-        if (!changeColourOverTime){
+        if (!changeColourOverTime && !colourPulsation){
             ctx.beginPath();
             points.forEach(([px, py], index) => {
                 
@@ -196,7 +215,7 @@ function draw2D() {
             });
             ctx.stroke();
         }
-        else{
+        else if(changeColourOverTime){
             points.forEach(([px, py], index) => {
                 if (index === 0) return; 
             
@@ -220,6 +239,29 @@ function draw2D() {
                 ctx.stroke(); // Stroke the segment
             });
             
+        }else{
+            points.forEach(([px, py], index) => {
+                if (index === 0) return; 
+            
+                
+                let [prevX, prevY] = points[index - 1];
+                let screenXPrev = (prevX + offset.x) * zoom;
+                let screenYPrev = (prevY + offset.y) * zoom;
+                let screenX = (px + offset.x) * zoom;
+                let screenY = (py + offset.y) * zoom;
+            
+                
+                let fade = fadeOverTime ? Math.min(opacity, alpha + (index / points.length) * 0.9) : opacity;
+            
+                
+                ctx.strokeStyle = `rgba(${125 + 125 * (Math.sin((index + 300) / 200))}, ${125 + 125 * (Math.sin((index + 600) / 300))},${125 + 125 * (Math.cos(index / 400))}, ${fade})`;
+            
+                // Draw a line segment
+                ctx.beginPath(); // Start a new path
+                ctx.moveTo(screenXPrev, screenYPrev); // Move to the previous point
+                ctx.lineTo(screenX, screenY); // Draw to the current point
+                ctx.stroke(); // Stroke the segment
+            });
         }
         
     }
