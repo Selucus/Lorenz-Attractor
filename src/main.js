@@ -9,6 +9,7 @@ let zoom = 10;
 let opacity = 1;
 let justPoints = false;
 let fadeOverTime = true;
+let changeColourOverTime = false;
 const gui = new dat.GUI();
 
 
@@ -25,7 +26,8 @@ const params = {
     zoom: 10,
     opacity: 1,
     justPoints: false,
-    fadeOverTime: true
+    fadeOverTime: true,
+    changeColourOverTime: false
 };
 gui.add(params, 'sigma', 0, 100).onChange(function(value) {
     sigma = value;
@@ -56,6 +58,9 @@ gui.add(params, 'justPoints').name('Draw Points Only').onChange(function(value) 
 });
 gui.add(params, 'fadeOverTime').name('Fade Over Time').onChange(function(value) {
     fadeOverTime = value; 
+});
+gui.add(params, 'changeColourOverTime').name('Change Colour Over Time').onChange(function(value) {
+    changeColourOverTime = value; 
 });
 
 
@@ -162,27 +167,61 @@ function draw2D() {
             let screenY = (py + offset.y) * zoom;
 
             ctx.beginPath();
-            ctx.arc(screenX, screenY, 3, 0, Math.PI * 2);
+            ctx.arc(screenX, screenY, 1, 0, Math.PI * 2);
 
             let fade = fadeOverTime ? Math.min(opacity, alpha + (index / points.length) * 0.9) : opacity;
-
-            ctx.fillStyle = `rgba(0, 0, 255, ${fade})`;
+            if(!changeColourOverTime){
+                ctx.fillStyle = `rgba(0, 0, 255, ${fade})`;
+            }
+            else{
+                ctx.fillStyle = `rgba(${125 - (px * 10)}, ${125 + (py * 10)}, 125, ${fade})`;
+            }
             ctx.fill();
         });
     } else{
+        if (!changeColourOverTime){
+            ctx.beginPath();
+            points.forEach(([px, py], index) => {
+                
+                // Scale and center the points
+                let screenX = (px + offset.x) * zoom;
+                let screenY = (py + offset.y) * zoom;
 
-        ctx.beginPath();
-        points.forEach(([px, py], index) => {
-            // Scale and center the points
-            let screenX = (px + offset.x) * zoom;
-            let screenY = (py + offset.y) * zoom;
+                let fade = fadeOverTime ? Math.min(opacity, alpha + (index / points.length) * 0.9) : opacity;
 
-            let fade = fadeOverTime ? Math.min(opacity, alpha + (index / points.length) * 0.9) : opacity;
-
-            ctx.strokeStyle = `rgba(251, 99, 118, ${fade})`;
-            ctx.lineTo(screenX, screenY);
-        });
-        ctx.stroke();
+                ctx.strokeStyle = `rgba(251, 99, 118, ${fade})`;
+                
+                ctx.lineTo(screenX, screenY);
+        
+            });
+            ctx.stroke();
+        }
+        else{
+            points.forEach(([px, py], index) => {
+                if (index === 0) return; 
+            
+                
+                let [prevX, prevY] = points[index - 1];
+                let screenXPrev = (prevX + offset.x) * zoom;
+                let screenYPrev = (prevY + offset.y) * zoom;
+                let screenX = (px + offset.x) * zoom;
+                let screenY = (py + offset.y) * zoom;
+            
+                
+                let fade = fadeOverTime ? Math.min(opacity, alpha + (index / points.length) * 0.9) : opacity;
+            
+                
+                ctx.strokeStyle = `rgba(${125 - (px * 10)}, ${125 + (py * 10)}, 125, ${fade})`;
+            
+                // Draw a line segment
+                ctx.beginPath(); // Start a new path
+                ctx.moveTo(screenXPrev, screenYPrev); // Move to the previous point
+                ctx.lineTo(screenX, screenY); // Draw to the current point
+                ctx.stroke(); // Stroke the segment
+            });
+            
+        }
+        
     }
     
     
