@@ -13,6 +13,7 @@ A dynamic and interactive visualization of the **Lorenz System**, a set of diffe
 ## Screenshots
 
 ![Lorenz Attractor Render 1](/renders/render1)
+![Lorenz Attractor Render 6](/renders/render6.png)
 ![Lorenz Attractor Render 2](/renders/render2)
 ![Lorenz Attractor Render 3](/renders/render3)
 ![Lorenz Attractor Render 4](/renders/render4)
