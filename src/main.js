@@ -189,12 +189,18 @@ function draw2D() {
             ctx.arc(screenX, screenY, 1, 0, Math.PI * 2);
 
             let fade = fadeOverTime ? Math.min(opacity, alpha + (index / points.length) * 0.9) : opacity;
-            if(!changeColourOverTime){
-                ctx.fillStyle = `rgba(0, 0, 255, ${fade})`;
+            if(changeColourOverTime){
+                
+                ctx.fillStyle = `rgba(${125 - (px * 10)}, ${125 + (py * 10)}, 125, ${fade})`;
+                
+            }
+            else if(colourPulsation){
+                ctx.fillStyle = `rgba(${125 + 125 * (Math.sin((index + 300) / 200))}, ${125 + 125 * (Math.sin((index + 600) / 300))},${125 + 125 * (Math.cos(index / 400))}, ${fade})`;
             }
             else{
-                ctx.fillStyle = `rgba(${125 - (px * 10)}, ${125 + (py * 10)}, 125, ${fade})`;
+                ctx.fillStyle = `rgba(0, 0, 255, ${fade})`;
             }
+            
             ctx.fill();
         });
     } else{
