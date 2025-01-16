@@ -12,9 +12,23 @@ A dynamic and interactive visualization of the **Lorenz System**, a set of diffe
 
 ## Screenshots
 
-![Lorenz Attractor Render 1](/renders/render1.png) ![Lorenz Attractor Render 6](/renders/render6.png)
-![Lorenz Attractor Render 2](/renders/render7.png) ![Lorenz Attractor Render 4](/renders/render8.png)
-![Lorenz Attractor Render 3](/renders/render3.png)  ![Lorenz Attractor Render 4](/renders/render4.png)
+<p align="center">
+  <img src="/renders/render1.png" alt="Render 1" width="500" style="display: inline-block; margin-right: 0px;">
+  <img src="/renders/render6.png" alt="Render 6" width="500" style="display: inline-block; margin-right: 0px;">
+</p>
+
+<p align="center">
+  <img src="/renders/render7.png" alt="Render 2" width="500" style="display: inline-block; margin-right: 0px;">
+  <img src="/renders/render8.png" alt="Render 4" width="500" style="display: inline-block; margin-right: 0px;">
+</p>
+
+<p align="center">
+  <img src="/renders/render3.png" alt="Render 3" width="500" style="display: inline-block; margin-right: 0px;">
+  <img src="/renders/render4.png" alt="Render 4" width="500" style="display: inline-block;">
+</p>
+
+
+
 
 
 
