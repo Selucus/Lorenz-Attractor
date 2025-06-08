@@ -1,6 +1,5 @@
 # Lorenz System Visualizer 
 
-A dynamic and interactive visualization of the **Lorenz System**, a set of differential equations that model chaotic systems and form the foundation of chaos theory. This project demonstrates how tiny changes in initial conditions can lead to vastly different outcomes—a hallmark of the famous **butterfly effect**. 🦋
 
 ## Features
 
